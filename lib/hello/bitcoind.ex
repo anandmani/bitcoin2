@@ -9,6 +9,11 @@ defmodule Bitcoind do
     GenServer.call(server, {:get_transactions})
   end
 
+  def get_dummy_block(server) do
+    IO.puts("get_dummy_block")
+    GenServer.call(server, {:get_dummy_block})
+  end
+
   @doc """
     Returns initial blockchain to calling node
   """
@@ -34,17 +39,14 @@ defmodule Bitcoind do
   #------------------------
   def spam(server) do
     GenServer.cast(server, {:spam, {}})
-    IO.puts "bitcoind spam";
   end
 
   def spam1() do
-    IO.puts "bitcoind spam1";
     Process.send_after(self(), :lol123, 1000)
   end
 
   def handle_info(:lol123, state) do
     HelloWeb.RoomChannel.spam()
-    IO.puts("handle_info");
     spam1()
     {:noreply, state}
   end
@@ -82,6 +84,9 @@ defmodule Bitcoind do
 
       :get_blockchain ->
         {:reply, state.blockchain, state}
+
+      :get_dummy_block ->
+        {:reply, %{:dummy => "info"}, state}
     end
   end
 

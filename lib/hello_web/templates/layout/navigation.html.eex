@@ -5,7 +5,7 @@
   <nav role="navigation">
     <ul class="hor-list">
       <li class="hor-list-item"><a href="http://localhost:4000/blocks">Blocks</a></li>
-      <li class="hor-list-item"><a href="http://localhost:4000/txns">Transactions</a></li>
+      <%# <li class="hor-list-item"><a href="http://localhost:4000/txns">Transactions</a></li> %>
       <li class="hor-list-item"><a href="http://localhost:4000/metrics">Metrics</a></li>
     </ul>
   </nav>

@@ -1,3 +1,9 @@
-<div class="phx-hero">
-    <canvas id="myChart" width="400" height="400"></canvas>
-</div>
+<section>
+    <h2>TX per Block</h2>
+    <canvas id="chart1" height="400" width="400"></canvas>
+    <br />
+    <br />
+    <br />
+    <h2>Value per Block</h2>
+    <canvas id="chart2" height="400" width="400"></canvas>
+</section>
