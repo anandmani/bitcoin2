@@ -31,6 +31,26 @@ defmodule Bitcoind do
     GenServer.cast(server, {:receive_transaction, {transaction}})
   end
 
+  #------------------------
+  def spam(server) do
+    GenServer.cast(server, {:spam, {}})
+    IO.puts "bitcoind spam";
+  end
+
+  def spam1() do
+    IO.puts "bitcoind spam1";
+    Process.send_after(self(), :lol123, 1000)
+  end
+
+  def handle_info(:lol123, state) do
+    HelloWeb.RoomChannel.spam()
+    IO.puts("handle_info");
+    spam1()
+    {:noreply, state}
+  end
+  #------------------------
+
+
   ## Server Callbacks
   def init(:ok) do
     {
@@ -99,6 +119,10 @@ defmodule Bitcoind do
           update_in(state[:transactions], fn transactions -> transactions ++ [transaction] end)
 
         {:noreply, new_state}
+
+      :spam ->
+        spam1()
+        {:noreply, state}
 
       :add_block ->
         block = methodArgs

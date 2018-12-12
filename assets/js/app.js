@@ -16,3 +16,4 @@ import Chart from "chart.js"
 //
 // Local files can be imported directly using relative paths, for example:
 import socket from "./socket"
+import "./loadChart"

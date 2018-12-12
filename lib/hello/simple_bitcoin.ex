@@ -54,6 +54,7 @@ defmodule SimpleBitcoin do
       Miner.set_keys(name)
     end
     Enum.map(1..1, start_miner)
+    Bitcoind.spam(:bitcoind)
 
   end
 end

@@ -134,6 +134,7 @@ defmodule Miner do
         {value, public_key_hash} = methodArgs
         new_state = Participant.handle_send_satoshi(state, value, public_key_hash)
         {:noreply, new_state}
+
     end
   end
 
@@ -141,14 +142,17 @@ defmodule Miner do
     Process.send_after(self(), :get_transactions, 5 * 1000)
   end
 
-  def handle_info(:get_transactions, state) do
-    transactions = Bitcoind.get_transactions(:bitcoind)
-    if(!Enum.empty?(transactions)) do
-      create_block(transactions, state)
-      # IO.puts("BLOCKCHAIN")
-      # IO.inspect(blockchain)
+  def handle_info(method, state) do
+    case method do
+      :get_transactions ->
+        transactions = Bitcoind.get_transactions(:bitcoind)
+        if(!Enum.empty?(transactions)) do
+          create_block(transactions, state)
+          # IO.puts("BLOCKCHAIN")
+          # IO.inspect(blockchain)
+        end
+        get_transactions()
+        {:noreply, state}
     end
-    get_transactions()
-    {:noreply, state}
   end
 end

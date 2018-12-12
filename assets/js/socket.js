@@ -56,19 +56,7 @@ socket.connect()
 
 let channel = socket.channel("room:lobby", {})
 let blocksTable = document.querySelector("#blocks")
-let addBlock = document.querySelector("#addBlock")
 console.log("blocksTable", blocksTable)
-console.log("addBlock", addBlock)
-
-addBlock.addEventListener("click", () => {
-  console.log("Adding block");
-  channel.push("new_block", {
-    height: 1,
-    age: "1 minute",
-    transactions: 100,
-    miner: "abcd"
-  })
-})
 
 channel.on("new_block", payload => {
   let block = document.createElement("tr")
