@@ -1,0 +1,19 @@
+<section>
+  <table style="width:100%">
+    <tr>
+      <th>Transaction hash</th>
+      <th>Age</th> 
+      <th>Amount (BTC)</th>
+    </tr>
+    <tr>
+      <td>qweyuiop</td>
+      <td>1 minute</td> 
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>asdfghjkl</td>
+      <td>2 minutes</td> 
+      <td>2</td>
+    </tr>
+  </table>          
+</section>
