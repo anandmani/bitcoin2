@@ -29,8 +29,8 @@ defmodule Participant do
     GenServer.cast(server, {:set_keys, {}})
   end
 
-  def   get_public_key(server) do
-    GenServer.call(server, {:get_public_key})
+  def get_public_key(server) do
+    GenServer.call(server, {:get_public_key}, 2*1000)
   end
 
   def inspect(server) do
@@ -204,7 +204,7 @@ defmodule Participant do
   end
 
   def send_satoshi() do
-    Process.send_after(self(), :send_satoshi, 2 * 1000)
+    Process.send_after(self(), :send_satoshi, 3 * 1000)
   end
 
   def handle_info(:send_satoshi, state) do
@@ -219,7 +219,12 @@ defmodule Participant do
       if(sender != receiver) do
         IO.puts("balance(#{sender})  = #{balance}")
         IO.puts("Sending #{value} satoshis from #{sender} to #{receiver}")
-        send_satoshi(self(), value, get_public_key(receiver))
+        try do
+          public_key_hash = get_public_key(receiver)
+          send_satoshi(self(), value, public_key_hash)
+        catch
+          :exit -> IO.puts("Could not get public_key_hash")
+        end
       end
     end
     send_satoshi()

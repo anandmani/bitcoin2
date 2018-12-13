@@ -32,22 +32,21 @@ defmodule Bitcoind do
   end
 
   #------------------------
-  def spam(server) do
-    GenServer.cast(server, {:spam, {}})
-    IO.puts "bitcoind spam";
-  end
+  # def spam(server) do
+  #   GenServer.cast(server, {:spam, {}})
+  #   IO.puts "bitcoind spam";
+  # end
 
-  def spam1() do
-    IO.puts "bitcoind spam1";
-    Process.send_after(self(), :lol123, 1000)
-  end
+  # def spam1() do
+  #   IO.puts "bitcoind spam1";
+  #   Process.send_after(self(), :lol123, 1000)
+  # end
 
-  def handle_info(:lol123, state) do
-    HelloWeb.RoomChannel.spam()
-    IO.puts("handle_info");
-    spam1()
-    {:noreply, state}
-  end
+  # def handle_info(:lol123, state) do
+  #   IO.puts("handle_info");
+  #   spam1()
+  #   {:noreply, state}
+  # end
   #------------------------
 
 
@@ -120,9 +119,9 @@ defmodule Bitcoind do
 
         {:noreply, new_state}
 
-      :spam ->
-        spam1()
-        {:noreply, state}
+      # :spam ->
+      #   spam1()
+      #   {:noreply, state}
 
       :add_block ->
         block = methodArgs
@@ -133,6 +132,7 @@ defmodule Bitcoind do
         end
         Enum.map(1..100, broadcast_blockchain)
         Miner.receive_block(:miner1, blockchain)
+        HelloWeb.RoomChannel.spam(block.block_height, block.timestamp, Enum.count(block.txns), block.nonce)
         case verify_block(Enum.reverse(blockchain)) do
           true -> {:noreply, Map.update!(state, :blockchain, fn _ -> blockchain end)}
           false -> {:noreply, state}

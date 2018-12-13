@@ -15,13 +15,13 @@ defmodule HelloWeb.RoomChannel do
     {:noreply, socket}
   end
 
-  def spam() do
+  def spam(height, timestamp, hash, nonce) do
     IO.puts "room_channel spam";
     HelloWeb.Endpoint.broadcast! "room:lobby", "new_block", %{
-      height: 999,
-      age: "new age",
-      transactions: 0,
-      miner: "bawse"
+      height: height,
+      age: timestamp,
+      transactions: hash,
+      miner: nonce
     }
   end
 end

@@ -97,7 +97,8 @@ defmodule Miner do
       receiver = String.to_atom("participant_" <>  Integer.to_string(:rand.uniform(100)))
       IO.puts("balance(miner_1)  = #{balance}")
       IO.puts("Sending #{value} satoshis from miner_1 to #{receiver}")
-      send_satoshi(self(), value, Participant.get_public_key(receiver))
+      public_key_hash = Participant.get_public_key(receiver)
+      send_satoshi(self(), value, public_key_hash)
     end
   end
 

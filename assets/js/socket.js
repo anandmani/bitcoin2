@@ -86,4 +86,29 @@ channel.join()
   .receive("ok", resp => { console.log("Joined successfully", resp) })
   .receive("error", resp => { console.log("Unable to join", resp) })
 
+let blockData = document.querySelector("#block-data")
+let hashData = document.querySelector("#hash-data")
+
+channel.on("block_data", payload => {
+    let blockTxns = document.querySelector("#txns")
+    blockTxns.innerText = payload.Txns
+    
+    let blockNonce = document.querySelector("#nonce")
+    blockNonce.innerText = payload.nonce
+
+    let blockDifficulty = document.querySelector("#target")
+    blockDifficulty.innerText = payload.difficulty
+
+    let blockDataHeight = document.querySelector("#height")
+    blockDataHeight.innerText = payload.height
+
+    let blockTimeStamp = document.querySelector("#timestamp")
+    blockTimeStamp.innerText = payload.Timestamp
+
+    let blockHash = document.querySelector("#hash")
+    blockHash.innerText = payload.hash
+
+    let blockPrevHash = document.querySelector("#prev-hash")
+    blockPrevHash.innerText = payload.prevHash
+})
 export default socket
