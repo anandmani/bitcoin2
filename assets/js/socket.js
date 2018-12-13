@@ -7,6 +7,7 @@
 // Pass the token on params as below. Or remove it
 // from the params if you are not using authentication.
 import {Socket} from "phoenix"
+import {drawChart1, drawChart2} from "./loadChart"
 
 let socket = new Socket("/socket", {params: {token: window.userToken}})
 
@@ -53,34 +54,45 @@ let socket = new Socket("/socket", {params: {token: window.userToken}})
 //
 // Finally, connect to the socket:
 socket.connect()
-
 let channel = socket.channel("room:lobby", {})
-let blocksTable = document.querySelector("#blocks")
-console.log("blocksTable", blocksTable)
 
-channel.on("new_block", payload => {
-  let block = document.createElement("tr")
-  
-  let blockHeight = document.createElement("td")
-  blockHeight.innerText = payload.height
-  block.appendChild(blockHeight)
+export const fillBlocksTable = () => {
+  let blocksTable = document.querySelector("#blocks")
+  channel.on("new_block", payload => {
+    let block = document.createElement("tr")
+    let blockHeight = document.createElement("td")
+    blockHeight.innerText = payload.height
+    block.appendChild(blockHeight)
+    let blockAge = document.createElement("td")
+    blockAge.innerText = payload.age
+    block.appendChild(blockAge)
+    let blockTransactions = document.createElement("td")
+    blockTransactions.innerText = payload.transactions
+    block.appendChild(blockTransactions)
+    let blockMiner = document.createElement("td")
+    blockMiner.innerText = payload.miner
+    block.appendChild(blockMiner)
+    console.log("block is", block)
+    blocksTable.insertBefore(block, blocksTable.firstChild)
+  })
+}
 
-  let blockAge = document.createElement("td")
-  blockAge.innerText = payload.age
-  block.appendChild(blockAge)
-  
-  let blockTransactions = document.createElement("td")
-  blockTransactions.innerText = payload.transactions
-  block.appendChild(blockTransactions)
-  
-  let blockMiner = document.createElement("td")
-  blockMiner.innerText = payload.miner
-  block.appendChild(blockMiner)
+export const fillCharts = () => {
+  let xValues = []
+  let yValues = []
+  channel.on("new_block2", ({height, transactions}) => {
+    xValues.push(height)
+    yValues.push(transactions)
+    drawChart1(xValues, yValues)
+  })
+}
 
-  console.log("block is", block)
-
-  blocksTable.insertBefore(block, blocksTable.firstChild)
-})
+export const fillBlockTable = (blockHeight) => {
+  channel.push("get_block", {blockHeight}, 10000)
+    .receive("ok", (msg) => console.log("created message", msg) )
+    .receive("error", (reasons) => console.log("create failed", reasons) )
+    .receive("timeout", () => console.log("Networking issue...") )
+}
 
 channel.join()
   .receive("ok", resp => { console.log("Joined successfully", resp) })

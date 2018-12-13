@@ -217,8 +217,8 @@ defmodule Participant do
       receiver = String.to_atom("participant_" <>  Integer.to_string(:rand.uniform(100)))
       sender = elem(List.first(Process.info(self())), 1)
       if(sender != receiver) do
-        IO.puts("balance(#{sender})  = #{balance}")
-        IO.puts("Sending #{value} satoshis from #{sender} to #{receiver}")
+        # IO.puts("balance(#{sender})  = #{balance}")
+        # IO.puts("Sending #{value} satoshis from #{sender} to #{receiver}")
         send_satoshi(self(), value, get_public_key(receiver))
       end
     end
