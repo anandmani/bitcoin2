@@ -18,7 +18,6 @@ defmodule HelloWeb.Router do
 
     get "/", BlocksController, :index
 
-    get "/blocks", BlocksController, :index
     get "/blocks/:block_height", BlocksController, :show
 
     get "/txns", TxnsController, :index

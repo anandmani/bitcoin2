@@ -1,35 +1,7 @@
 <section>
+
   <h2>Block</h2>
-  <div class = "col-md-6 col-sm-6" style="width:50%">
-    <table class = "table table-striped">
-      <tbody id = "block-data">
-        <tr>
-          <th colspan = "2">Summary</th>
-        </tr>
-        <tr>
-          <td>Number of transactions</td>
-          <td id = "txns">100</td>
-        </tr>
-        <tr>
-          <td>Nonce</td>
-          <td id = "nonce">ABF</td>
-        </tr>
-        <tr>
-          <td>Difficulty</td>
-          <td id = "target">3</td>
-        </tr>
-        <tr>
-          <td>Height</td>
-          <td id = "height">5</td>
-        </tr>
-        <tr>
-          <td>Timestamp</td>
-          <td id = "timestamp">23719837</td>
-        </tr> 
-      </tbody>
-    </table>
-  </div>
-    
+
   <div class = "col-md-6 col-sm-6" style="padding-left: 15px padding-right: 15px">
     <table class = "table table-striped" style="width: 50%">
       <tbody id = "hash-data">
@@ -38,34 +10,63 @@
         </tr>
         <tr>
           <td>Hash</td>
-          <td id = "hash">uhdiwuhdihdiuhwd</td>
+          <td id = "hash"></td>
         </tr>
         <tr>
           <td>Prev Hash</td>
-          <td id = "prev-hash">wiwdwidbedwljk</td>
+          <td id = "prev_hash"></td>
         </tr>
       </tbody>
     </table>
   </div>
-  
+
+  <div class = "col-md-6 col-sm-6" style="width:50%">
+    <table class = "table table-striped">
+      <tbody id = "block-data">
+        <tr>
+          <th colspan = "2">Summary</th>
+        </tr>
+        <tr>
+          <td>Height</td>
+          <td id = "height"></td>
+        </tr>
+        <tr>
+          <td>Number of transactions</td>
+          <td id = "num_txns"></td>
+        </tr>
+        <tr>
+          <td>Nonce</td>
+          <td id = "nonce"></td>
+        </tr>
+        <tr>
+          <td>Merkle Root</td>
+          <td id = "merkle_root"></td>
+        </tr>
+        <tr>
+          <td>Difficulty</td>
+          <td id = "target"></td>
+        </tr>
+
+        <tr>
+          <td>Timestamp</td>
+          <td id = "timestamp"></td>
+        </tr> 
+      </tbody>
+    </table>
+  </div>
 
   <h2>Transactions</h2>
-  <div class = "row" style = "padding-left: 15px padding-right: 15px">
-    <div class = "col-md-6 col-sm-6" style="width:100%">
-      <table class = "table table-striped">
-        <tbody id = "txns-data">
-          <tr>
-            <td colspan = "3">Trans hash</td>
-          </tr>
-          <tr>
-            <td>Transaction input</td>
-            <td>Transaction output</td>
-            <td>utxos</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div> 
+  <div class = "col-md-6 col-sm-6" style="width:50%">
+    <table class = "table table-striped">
+      <thead>
+        <tr>
+          <th>Transaction hash</th>
+        </tr>
+      </thead>
+      <tbody id = "txns">
+      </tbody>
+    </table>
+  </div>
 
 </section>
 
