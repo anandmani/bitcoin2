@@ -14,6 +14,10 @@ defmodule Bitcoind do
     GenServer.call(server, {:get_dummy_block, nil})
   end
 
+  def get_blocks_meta(server) do
+    GenServer.call(server, {:get_blocks_meta, nil})
+  end
+
   @doc """
     Returns initial blockchain to calling node
   """
@@ -68,6 +72,17 @@ defmodule Bitcoind do
     Enum.at(blockchain, height)
   end
 
+  def handle_get_blocks_meta(blockchain) do
+    Enum.map(blockchain, fn block ->
+      %{
+        height: block.block_height,
+        age: block.timestamp,
+        num_txns: Enum.count(block.txns),
+        nonce: block.nonce
+      }
+    end)
+  end
+
   def handle_call({method, methodArgs}, _from, state) do
     case method do
       :get_transactions ->
@@ -84,6 +99,10 @@ defmodule Bitcoind do
         {height} = methodArgs
         block = handle_get_block_by_height(height, state.blockchain)
         {:reply, block, state}
+
+      :get_blocks_meta ->
+        blocks = handle_get_blocks_meta(state.blockchain)
+        {:reply, blocks, state}
     end
   end
 
