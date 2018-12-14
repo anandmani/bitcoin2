@@ -140,7 +140,7 @@ defmodule Miner do
   end
 
   defp get_transactions() do
-    Process.send_after(self(), :get_transactions, 5 * 1000)
+    Process.send_after(self(), :get_transactions, 3 * 1000)
   end
 
   def handle_info(method, state) do

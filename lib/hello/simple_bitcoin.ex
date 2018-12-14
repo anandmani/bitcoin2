@@ -25,13 +25,19 @@ defmodule SimpleBitcoin do
     {:ok, bitcoind_pid} = Bitcoind.start_link([])
     Process.register(bitcoind_pid, :bitcoind)
 
+    set_public_key_map = fn x ->
+      name = String.to_atom("participant_"<>Integer.to_string(x))
+      Map.merge(%{:name => name}, Wallet.get_keys())
+    end
+    public_key_hash_map = Enum.map(1..100, set_public_key_map)
+
     # Start participants
     start_participant = fn x ->
       name = String.to_atom("participant_"<>Integer.to_string(x))
       {:ok, pid} = Participant.start_link([])
       Process.register(pid, name)
       Participant.register(name)
-      Participant.set_keys(name)
+      Participant.set_keys(name, public_key_hash_map, x-1)
       if (name == :participant_1) do
         IO.puts("Creating genesis")
         Bitcoind.generate_genesis_block(:bitcoind, Participant.get_public_key(name))
