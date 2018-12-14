@@ -6,19 +6,23 @@ defmodule Bitcoind do
   end
 
   def get_transactions(server) do
-    GenServer.call(server, {:get_transactions})
+    GenServer.call(server, {:get_transactions, nil})
   end
 
   def get_dummy_block(server) do
     IO.puts("get_dummy_block")
-    GenServer.call(server, {:get_dummy_block})
+    GenServer.call(server, {:get_dummy_block, nil})
   end
 
   @doc """
     Returns initial blockchain to calling node
   """
   def get_blockchain(server) do
-    GenServer.call(server, {:get_blockchain})
+    GenServer.call(server, {:get_blockchain, nil})
+  end
+
+  def get_block_by_height(server, height) do
+    GenServer.call(server, {:get_block_by_height, {height}})
   end
 
   def add_block(server, block) do
@@ -60,7 +64,11 @@ defmodule Bitcoind do
     end
   end
 
-  def handle_call({method}, _from, state) do
+  def handle_get_block_by_height(height, blockchain) do
+    Enum.at(blockchain, height)
+  end
+
+  def handle_call({method, methodArgs}, _from, state) do
     case method do
       :get_transactions ->
         transactions = state.transactions
@@ -71,6 +79,11 @@ defmodule Bitcoind do
 
       :get_dummy_block ->
         {:reply, %{:dummy => "info"}, state}
+
+      :get_block_by_height ->
+        {height} = methodArgs
+        block = handle_get_block_by_height(height, state.blockchain)
+        {:reply, block, state}
     end
   end
 

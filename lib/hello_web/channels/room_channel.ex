@@ -18,26 +18,19 @@ defmodule HelloWeb.RoomChannel do
       "get_block" ->
         block_height = message["blockHeight"]
         IO.puts "handle_in #{block_height}"
-        response = Bitcoind.get_dummy_block(:bitcoind)
+        response = Bitcoind.get_block_by_height(:bitcoind, block_height)
         IO.inspect response
         {:reply, {:ok, response}, socket}
     end
   end
 
 
-  def spam(height, timestamp, hash, nonce) do
-    IO.puts "room_channel spam";
+  def spam(height, timestamp, num_txns, nonce) do
     HelloWeb.Endpoint.broadcast! "room:lobby", "new_block", %{
       height: height,
       age: timestamp,
-      transactions: hash,
+      num_txns: num_txns,
       miner: nonce
-    }
-    HelloWeb.Endpoint.broadcast! "room:lobby", "new_block2", %{
-      height: 100,
-      age: "new age",
-      transactions: 0,
-      miner: "bawse"
     }
   end
 end

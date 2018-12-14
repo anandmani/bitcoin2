@@ -11,48 +11,6 @@ import {drawChart1, drawChart2} from "./loadChart"
 
 let socket = new Socket("/socket", {params: {token: window.userToken}})
 
-// When you connect, you'll often need to authenticate the client.
-// For example, imagine you have an authentication plug, `MyAuth`,
-// which authenticates the session and assigns a `:current_user`.
-// If the current user exists you can assign the user's token in
-// the connection for use in the layout.
-//
-// In your "lib/web/router.ex":
-//
-//     pipeline :browser do
-//       ...
-//       plug MyAuth
-//       plug :put_user_token
-//     end
-//
-//     defp put_user_token(conn, _) do
-//       if current_user = conn.assigns[:current_user] do
-//         token = Phoenix.Token.sign(conn, "user socket", current_user.id)
-//         assign(conn, :user_token, token)
-//       else
-//         conn
-//       end
-//     end
-//
-// Now you need to pass this token to JavaScript. You can do so
-// inside a script tag in "lib/web/templates/layout/app.html.eex":
-//
-//     <script>window.userToken = "<%= assigns[:user_token] %>";</script>
-//
-// You will need to verify the user token in the "connect/3" function
-// in "lib/web/channels/user_socket.ex":
-//
-//     def connect(%{"token" => token}, socket, _connect_info) do
-//       # max_age: 1209600 is equivalent to two weeks in seconds
-//       case Phoenix.Token.verify(socket, "user socket", token, max_age: 1209600) do
-//         {:ok, user_id} ->
-//           {:ok, assign(socket, :user, user_id)}
-//         {:error, reason} ->
-//           :error
-//       end
-//     end
-//
-// Finally, connect to the socket:
 socket.connect()
 let channel = socket.channel("room:lobby", {})
 
@@ -61,13 +19,17 @@ export const fillBlocksTable = () => {
   channel.on("new_block", payload => {
     let block = document.createElement("tr")
     let blockHeight = document.createElement("td")
-    blockHeight.innerText = payload.height
+    let link = document.createElement('a');
+    link.setAttribute('class', 'signature');
+    link.setAttribute('href', `http://localhost:4000/blocks/${payload.height}`);
+    link.innerText = payload.height
+    blockHeight.appendChild(link)
     block.appendChild(blockHeight)
     let blockAge = document.createElement("td")
     blockAge.innerText = payload.age
     block.appendChild(blockAge)
     let blockTransactions = document.createElement("td")
-    blockTransactions.innerText = payload.transactions
+    blockTransactions.innerText = payload.num_txns
     block.appendChild(blockTransactions)
     let blockMiner = document.createElement("td")
     blockMiner.innerText = payload.miner
@@ -80,16 +42,38 @@ export const fillBlocksTable = () => {
 export const fillCharts = () => {
   let xValues = []
   let yValues = []
-  channel.on("new_block2", ({height, transactions}) => {
+  channel.on("new_block", ({height, num_txns}) => {
     xValues.push(height)
-    yValues.push(transactions)
+    yValues.push(num_txns)
     drawChart1(xValues, yValues)
   })
 }
 
-export const fillBlockTable = (blockHeight) => {
+let fillBlockTable = (block) => {
+  console.log("block received", block)
+  let {block_height, hash, merkle_root, nonce, prev_hash, target, timestamp, txns } = block
+  document.getElementById("num_txns").innerHTML = txns.length
+  document.getElementById("nonce").innerHTML = nonce
+  document.getElementById("target").innerHTML = target
+  document.getElementById("height").innerHTML = block_height
+  document.getElementById("timestamp").innerHTML = timestamp
+  document.getElementById("hash").innerHTML = hash
+  document.getElementById("merkle_root").innerHTML = merkle_root
+  document.getElementById("prev_hash").innerHTML = prev_hash
+  let transactions = document.getElementById("txns")
+  txns.forEach((txn) => {
+    let row = document.createElement("tr")
+    let cell = document.createElement("td")
+    cell.innerHTML = txn.hash 
+    row.appendChild(cell)
+    transactions.appendChild(row)
+  })
+
+}
+
+export const getBlock = (blockHeight) => {
   channel.push("get_block", {blockHeight}, 10000)
-    .receive("ok", (msg) => console.log("created message", msg) )
+    .receive("ok", fillBlockTable )
     .receive("error", (reasons) => console.log("create failed", reasons) )
     .receive("timeout", () => console.log("Networking issue...") )
 }

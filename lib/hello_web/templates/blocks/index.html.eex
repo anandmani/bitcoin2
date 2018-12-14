@@ -4,27 +4,12 @@
     <thead>
       <tr>
         <th>Height</th>
-        <th>Age</th> 
+        <th>Time</th> 
         <th>Transactions</th>
-        <th>Miner</th>
+        <th>Nonce</th>
       </tr>
     </thead>
     <tbody id="blocks">
-      <tr>
-        <td>
-          <a href="http://localhost:4000/blocks/2">2</a>
-        </td>
-        <td>1 minute</td> 
-        <td>5</td>
-        <td>pid: 1234</td>
-      </tr>
-      <tr>
-        <td>1</td>
-        <td>2 minutes</td> 
-        <td>3</td>
-        <td>pid: 1234</td>
-      </tr>
     </tbody>
   </table>
-  <button id="addBlock">Add Block</button>
 </section>
