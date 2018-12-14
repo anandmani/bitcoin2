@@ -25,12 +25,12 @@ defmodule Participant do
   end
 
   @doc "Set hardcoded keys. Used in the case of genesis block, to set keys for first participant"
-  def set_keys(server) do
-    GenServer.cast(server, {:set_keys, {}})
+  def set_keys(server, public_key_hash_map, participant_no) do
+    GenServer.cast(server, {:set_keys, {public_key_hash_map, participant_no}})
   end
 
   def get_public_key(server) do
-    GenServer.call(server, {:get_public_key}, 2*1000)
+    GenServer.call(server, {:get_public_key}, 2 * 1000)
   end
 
   def inspect(server) do
@@ -71,7 +71,8 @@ defmodule Participant do
        ],
        :private_key => nil,
        :public_key => nil,
-       :public_key_hash => nil
+       :public_key_hash => nil,
+       :public_key_hash_map => nil
        # TODO:  :signature => nil
      }}
   end
@@ -117,12 +118,13 @@ defmodule Participant do
     }
 
     tx = Transaction.add_hash(tx)
-    # IO.puts("Transaction created")
+    IO.puts("Transaction created")
     tx
   end
 
   def handle_send_satoshi(state, value, public_key_hash) do
     {reduced_sum, reduced_index} = reduce_utxos(state[:utxos], value)
+
     cond do
       reduced_sum < value ->
         # IO.puts("Insufficient balance")
@@ -132,17 +134,20 @@ defmodule Participant do
         utxos_needed = Enum.take(state[:utxos], reduced_index + 1)
         transaction_inputs = get_transaction_inputs_from_utxos(utxos_needed, state.public_key)
         change = reduced_sum - value
-        transaction_outputs = cond do
-          change == 0 ->
-            [
-              Transaction.generate_a_tx_out(value, public_key_hash)
-            ]
-          true ->
-            [
-              Transaction.generate_a_tx_out(value, public_key_hash),
-              Transaction.generate_a_tx_out(change, state.public_key_hash)
-            ]
-        end
+
+        transaction_outputs =
+          cond do
+            change == 0 ->
+              [
+                Transaction.generate_a_tx_out(value, public_key_hash)
+              ]
+
+            true ->
+              [
+                Transaction.generate_a_tx_out(value, public_key_hash),
+                Transaction.generate_a_tx_out(change, state.public_key_hash)
+              ]
+          end
 
         tx = create_tx_from_inputs_and_outputs(transaction_inputs, transaction_outputs)
         Bitcoind.receive_transaction(:bitcoind, tx)
@@ -178,8 +183,19 @@ defmodule Participant do
         {:noreply, new_state}
 
       :set_keys ->
-        participant_key_map = Wallet.get_keys()
-        {:noreply, Map.merge(state, participant_key_map)}
+        {public_key_hash_map, participant_no} = methodArgs
+        participant_map = elem(Enum.fetch(public_key_hash_map, participant_no), 1)
+        private_key = participant_map[:private_key]
+        public_key = participant_map[:public_key]
+        public_key_hash = participant_map[:public_key_hash]
+        {:noreply, Map.merge(state,
+          %{
+              :private_key => private_key,
+              :public_key => public_key,
+              :public_key_hash => public_key_hash,
+              :public_key_hash_map => public_key_hash_map
+            }
+        )}
 
       :receive_block ->
         {blockchain} = methodArgs
@@ -204,31 +220,30 @@ defmodule Participant do
   end
 
   def send_satoshi() do
-    Process.send_after(self(), :send_satoshi, 3 * 1000)
+    Process.send_after(self(), :send_satoshi, 2 * 1000)
   end
 
   def handle_info(:send_satoshi, state) do
-    # sender = elem(List.first(Process.info(self())), 1)
-    # IO.inspect(sender)
-    # IO.inspect(state.utxos)
-    if (!Enum.empty?(state.utxos)) do
+    if !Enum.empty?(state.utxos) do
       value = :rand.uniform(50)
       balance = Enum.reduce(state.utxos, 0, fn ({k, _v}, acc) -> k + acc end)
-      receiver = String.to_atom("participant_" <>  Integer.to_string(:rand.uniform(100)))
+      participant_no = :rand.uniform(100)
+      receiver = String.to_atom("participant_" <> Integer.to_string(participant_no))
       sender = elem(List.first(Process.info(self())), 1)
+
       if(sender != receiver) do
         IO.puts("balance(#{sender})  = #{balance}")
         IO.puts("Sending #{value} satoshis from #{sender} to #{receiver}")
         try do
-          public_key_hash = get_public_key(receiver)
+          public_key_hash = elem(Enum.fetch(state.public_key_hash_map, participant_no-1), 1)[:public_key_hash]
           send_satoshi(self(), value, public_key_hash)
         catch
           :exit -> IO.puts("Could not get public_key_hash")
         end
       end
     end
+
     send_satoshi()
     {:noreply, state}
   end
-
 end
