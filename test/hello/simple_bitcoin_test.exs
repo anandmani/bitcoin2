@@ -1,0 +1,3 @@
+defmodule SimpleBitcoinTest do
+
+end
