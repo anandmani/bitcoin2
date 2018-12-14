@@ -15,14 +15,14 @@ import Chart from "chart.js"
 // Import local files
 //
 // Local files can be imported directly using relative paths, for example:
-import socket, {fillBlocksTable, fillCharts, getBlock} from "./socket"
+import socket, {getBlocks, getChartData, getBlock} from "./socket"
 
 let pathname = window.location.pathname
 let singleBlockPath = /\/blocks\/[a-z]*/
 if(pathname == '/metrics'){
-  fillCharts()
+  getChartData()
 }else if(pathname == '/'){
-  fillBlocksTable()
+  getBlocks()
 }else if(singleBlockPath.test(pathname)){
   let blockHeight = Number(pathname.split('/')[2])
   getBlock(blockHeight)

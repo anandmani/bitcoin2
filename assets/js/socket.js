@@ -14,39 +14,63 @@ let socket = new Socket("/socket", {params: {token: window.userToken}})
 socket.connect()
 let channel = socket.channel("room:lobby", {})
 
-export const fillBlocksTable = () => {
+const addRowToBlocksTable = (payload) => {
   let blocksTable = document.querySelector("#blocks")
-  channel.on("new_block", payload => {
-    let block = document.createElement("tr")
-    let blockHeight = document.createElement("td")
-    let link = document.createElement('a');
-    link.setAttribute('class', 'signature');
-    link.setAttribute('href', `http://localhost:4000/blocks/${payload.height}`);
-    link.innerText = payload.height
-    blockHeight.appendChild(link)
-    block.appendChild(blockHeight)
-    let blockAge = document.createElement("td")
-    blockAge.innerText = payload.age
-    block.appendChild(blockAge)
-    let blockTransactions = document.createElement("td")
-    blockTransactions.innerText = payload.num_txns
-    block.appendChild(blockTransactions)
-    let blockMiner = document.createElement("td")
-    blockMiner.innerText = payload.miner
-    block.appendChild(blockMiner)
-    console.log("block is", block)
-    blocksTable.insertBefore(block, blocksTable.firstChild)
+  let block = document.createElement("tr")
+  let blockHeight = document.createElement("td")
+  let link = document.createElement('a');
+  link.setAttribute('class', 'signature');
+  link.setAttribute('href', `http://localhost:4000/blocks/${payload.height}`);
+  link.innerText = payload.height
+  blockHeight.appendChild(link)
+  block.appendChild(blockHeight)
+  let blockAge = document.createElement("td")
+  blockAge.innerText = payload.age
+  block.appendChild(blockAge)
+  let blockTransactions = document.createElement("td")
+  blockTransactions.innerText = payload.num_txns
+  block.appendChild(blockTransactions)
+  let blockNonce = document.createElement("td")
+  blockNonce.innerText = payload.nonce
+  block.appendChild(blockNonce)
+  blocksTable.insertBefore(block, blocksTable.firstChild)
+}
+
+const fillBlocksTable = (payload) => {
+  console.log("blocks_meta", payload) 
+  payload.blocks.map(addRowToBlocksTable)
+  channel.on("new_block", addRowToBlocksTable)  //Subscribing to live blocks
+}
+
+export const getBlocks = () => {
+  //Get all blocks that have been mined so far. Subscribing to live blocks later
+  channel.push("get_blocks_meta", {}, 10000)
+    .receive("ok", fillBlocksTable) 
+    .receive("error", (reasons) => console.log("create failed", reasons) )
+    .receive("timeout", () => console.log("Networking issue...") )
+}
+
+const fillCharts = (payload) => {
+  console.log("blocks_meta", payload) 
+  let xValues = payload.blocks.map(block => block.height)
+  let yValues1 = payload.blocks.map(block => block.num_txns)
+  let yValues2 = payload.blocks.map(block => block.amount)
+  //Subscribing to live blocks
+  channel.on("new_block", ({height, num_txns}) => {
+    xValues.push(height)
+    yValues1.push(num_txns)
+    yValues2.push(amount)
+    drawChart1(xValues, yValues1)
+    drawChart2(xValues, yValues2)
   })
 }
 
-export const fillCharts = () => {
-  let xValues = []
-  let yValues = []
-  channel.on("new_block", ({height, num_txns}) => {
-    xValues.push(height)
-    yValues.push(num_txns)
-    drawChart1(xValues, yValues)
-  })
+export const getChartData = () => {
+  //Getting all mined blocks
+  channel.push("get_blocks_meta", {}, 10000)
+  .receive("ok", fillCharts) 
+  .receive("error", (reasons) => console.log("create failed", reasons) )
+  .receive("timeout", () => console.log("Networking issue...") )
 }
 
 let fillBlockTable = (block) => {
@@ -85,26 +109,4 @@ channel.join()
 let blockData = document.querySelector("#block-data")
 let hashData = document.querySelector("#hash-data")
 
-channel.on("block_data", payload => {
-    let blockTxns = document.querySelector("#txns")
-    blockTxns.innerText = payload.Txns
-    
-    let blockNonce = document.querySelector("#nonce")
-    blockNonce.innerText = payload.nonce
-
-    let blockDifficulty = document.querySelector("#target")
-    blockDifficulty.innerText = payload.difficulty
-
-    let blockDataHeight = document.querySelector("#height")
-    blockDataHeight.innerText = payload.height
-
-    let blockTimeStamp = document.querySelector("#timestamp")
-    blockTimeStamp.innerText = payload.Timestamp
-
-    let blockHash = document.querySelector("#hash")
-    blockHash.innerText = payload.hash
-
-    let blockPrevHash = document.querySelector("#prev-hash")
-    blockPrevHash.innerText = payload.prevHash
-})
 export default socket

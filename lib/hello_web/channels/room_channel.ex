@@ -21,6 +21,13 @@ defmodule HelloWeb.RoomChannel do
         response = Bitcoind.get_block_by_height(:bitcoind, block_height)
         IO.inspect response
         {:reply, {:ok, response}, socket}
+      "get_blocks_meta" ->
+        IO.puts "get_blocks_meta"
+        response = %{
+          blocks: Bitcoind.get_blocks_meta(:bitcoind)
+        }
+        IO.inspect response;
+        {:reply, {:ok, response}, socket}
     end
   end
 
@@ -30,7 +37,7 @@ defmodule HelloWeb.RoomChannel do
       height: height,
       age: timestamp,
       num_txns: num_txns,
-      miner: nonce
+      nonce: nonce
     }
   end
 end
