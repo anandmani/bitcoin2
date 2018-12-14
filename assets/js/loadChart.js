@@ -51,7 +51,7 @@ export const drawChart2 = (xValues, yValues) => {
             }]
         },
         options: {
-            responsive: false,
+            // responsive: false,
             animation: {duration: 0},
             scales: {
                 yAxes: [{

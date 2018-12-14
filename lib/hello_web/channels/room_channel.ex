@@ -37,7 +37,7 @@ defmodule HelloWeb.RoomChannel do
       height: height,
       age: timestamp,
       num_txns: num_txns,
-      amount: amount
+      amount: amount,
       nonce: nonce
     }
   end

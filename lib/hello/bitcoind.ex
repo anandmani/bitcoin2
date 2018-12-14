@@ -78,7 +78,8 @@ defmodule Bitcoind do
         height: block.block_height,
         age: block.timestamp,
         num_txns: Enum.count(block.txns),
-        nonce: block.nonce
+        nonce: block.nonce,
+        amount: block.amount
       }
     end)
   end

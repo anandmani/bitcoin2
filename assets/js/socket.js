@@ -56,7 +56,7 @@ const fillCharts = (payload) => {
   let yValues1 = payload.blocks.map(block => block.num_txns)
   let yValues2 = payload.blocks.map(block => block.amount)
   //Subscribing to live blocks
-  channel.on("new_block", ({height, num_txns}) => {
+  channel.on("new_block", ({height, num_txns, amount}) => {
     xValues.push(height)
     yValues1.push(num_txns)
     yValues2.push(amount)
