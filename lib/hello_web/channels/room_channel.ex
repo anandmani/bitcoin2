@@ -25,12 +25,13 @@ defmodule HelloWeb.RoomChannel do
   end
 
 
-  def spam(height, timestamp, num_txns, nonce) do
+  def spam(height, timestamp, num_txns, nonce, amount) do
     HelloWeb.Endpoint.broadcast! "room:lobby", "new_block", %{
       height: height,
       age: timestamp,
       num_txns: num_txns,
-      miner: nonce
+      miner: nonce,
+      amount: amount
     }
   end
 end

@@ -135,7 +135,7 @@ defmodule Bitcoind do
         end
         Enum.map(1..100, broadcast_blockchain)
         Miner.receive_block(:miner1, blockchain)
-        HelloWeb.RoomChannel.spam(block.block_height, block.timestamp, Enum.count(block.txns), block.nonce)
+        HelloWeb.RoomChannel.spam(block.block_height, block.timestamp, Enum.count(block.txns), block.nonce, block.amount)
         case verify_block(Enum.reverse(blockchain)) do
           true -> {:noreply, Map.update!(state, :blockchain, fn _ -> blockchain end)}
           false -> {:noreply, state}
