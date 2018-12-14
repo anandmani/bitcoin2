@@ -127,7 +127,7 @@ defmodule Participant do
 
     cond do
       reduced_sum < value ->
-        # IO.puts("Insufficient balance")
+        IO.puts("Insufficient balance")
         state
 
       true ->
