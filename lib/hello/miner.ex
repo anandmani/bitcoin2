@@ -59,8 +59,11 @@ defmodule Miner do
     last_block = List.last(Bitcoind.get_blockchain(:bitcoind))
     prev_hash = last_block.hash
     block_height = last_block.block_height + 1
+    amount =
+      Enum.map(transactions, fn txn -> Enum.reduce(txn[:tx_out], 0, fn (m, acc) -> m[:value] + acc end) end) |>
+      Enum.sum()
     transactions = [create_coinbase_transaction(500, state)] ++ transactions
-    block = Block.create(merkle_root, prev_hash, block_height, transactions)
+    block = Block.create(merkle_root, prev_hash, block_height, transactions, amount)
     # IO.puts("miner utxos")
     # IO.inspect(state.utxos)
     Bitcoind.add_block(:bitcoind, block)

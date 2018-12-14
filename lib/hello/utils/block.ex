@@ -1,9 +1,8 @@
 defmodule Block do
   @target 3
 
-  def create(data, prev_hash, block_height, txns) do
+  def create(data, prev_hash, block_height, txns, amount \\ 0) do
     timestamp = DateTime.utc_now() |> DateTime.to_unix()
-
     block = %{
       :merkle_root => data,
       :timestamp => timestamp,
@@ -12,7 +11,8 @@ defmodule Block do
       :nonce => 0,
       :target => @target,
       :block_height => block_height,
-      :txns => txns
+      :txns => txns,
+      :amount => amount
     }
 
     if(data == "") do
